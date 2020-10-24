@@ -69,7 +69,7 @@ export default function Board() {
   }]);
 
   const callAPI = () => {
-      fetch("http://localhost:9000/testAPI")
+      fetch("https://midterm596server.herokuapp.com/testAPI")
       .then(res => res.json())
       .then(res => {
         console.log(res);
