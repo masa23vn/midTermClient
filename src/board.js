@@ -63,7 +63,7 @@ export default function Board() {
   const classes = useStyles();
   const [data, setData] = useState([]);
 
-  /*
+  
   const callAPI = () => {
       fetch("https://midterm596server.herokuapp.com/testAPI")
       .then(res => res.json())
@@ -72,16 +72,16 @@ export default function Board() {
         setData(res);
       });
   }
-  */
- const cards = [1,2,3,4];
-
- const callAPI = () => {
-  fetch("http://localhost:9000/testAPI")
-  .then(res => res.json())
-  .then(res => {
-    setData(res);
-  });
-}
+  
+ /*
+  const callAPI = () => {
+    fetch("http://localhost:9000/testAPI")
+    .then(res => res.json())
+    .then(res => {
+      setData(res);
+    });
+  }
+*/
 
   useEffect(()=>{
       callAPI();
