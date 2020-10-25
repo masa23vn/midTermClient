@@ -59,15 +59,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
 export default function Board() {
   const classes = useStyles();
-  const [data, setData] = useState([{
-      name: "",
-      description: "",
-  }]);
+  const [data, setData] = useState([]);
 
+  /*
   const callAPI = () => {
       fetch("https://midterm596server.herokuapp.com/testAPI")
       .then(res => res.json())
@@ -76,7 +72,17 @@ export default function Board() {
         setData(res);
       });
   }
-  
+  */
+ const cards = [1,2,3,4];
+
+ const callAPI = () => {
+  fetch("http://localhost:9000/testAPI")
+  .then(res => res.json())
+  .then(res => {
+    setData(res);
+  });
+}
+
   useEffect(()=>{
       callAPI();
   },[])
@@ -123,8 +129,8 @@ export default function Board() {
         <Container className={classes.cardGrid} maxWidth="md">
           {/* End hero unit */}
           <Grid container spacing={4}>
-            {data.map((card, i) => (
-              <Grid item key={i} xs={12} sm={6} md={4}>
+            {data.map((board) => (
+              <Grid item key={board.ID} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
                   <CardMedia
                     className={classes.cardMedia}
@@ -133,10 +139,10 @@ export default function Board() {
                   />
                   <CardContent className={classes.cardContent}>
                     <Typography gutterBottom variant="h5" component="h2">
-                        {card.name}
+                        {board.name}
                     </Typography>
                     <Typography>
-                        {card.description}
+                        {board.description}
                     </Typography>
                   </CardContent>
                   <CardActions>
