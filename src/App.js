@@ -52,7 +52,6 @@ const routes = [
   },
   {
     path: "/Board/:id",
-    private: true,
     main: () => <Board />
   },
 ];
