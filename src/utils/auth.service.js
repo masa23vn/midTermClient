@@ -13,7 +13,6 @@ const register = (username, fullname, email, password) => {
   })
     .then((response) => {
       if (response.data.token) {
-        delete response.data.user[0].password;
         localStorage.setItem("user", JSON.stringify(response.data));
 
         // set axios header
@@ -33,7 +32,6 @@ const login = (username, password) => {
     })
     .then((response) => {
       if (response.data.token) {
-        console.log(response.data);
         localStorage.setItem("user", JSON.stringify(response.data));
         
         
