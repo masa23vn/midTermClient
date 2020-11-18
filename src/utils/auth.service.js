@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// test
 //const API_URL = "http://localhost:9000/auth/";
 const API_URL = "https://midterm596server.herokuapp.com/auth/";
 
@@ -32,7 +33,7 @@ const login = (username, password) => {
     })
     .then((response) => {
       if (response.data.token) {
-        delete response.data.user[0].password;
+        console.log(response.data);
         localStorage.setItem("user", JSON.stringify(response.data));
         
         

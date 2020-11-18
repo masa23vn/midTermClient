@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   useHistory,
 } from "react-router-dom";
@@ -12,7 +12,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import AuthService from "../utils/auth.service";
+import AuthService from "../../utils/auth.service";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -35,84 +35,84 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function SignUp(props) {
-    const classes = useStyles();
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [password2, setPassword2] = useState("");
-    const [email, setEmail] = useState("");
-    const [fullname, setFullname] = useState("");
+  const classes = useStyles();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
+  const [email, setEmail] = useState("");
+  const [fullname, setFullname] = useState("");
 
-    const [message, setMessage] = useState("");
-  
-    const onChangeUsername = (e) => {
-      const username = e.target.value;
-      setUsername(username);
-    };
-  
-    const onChangeFullname = (e) => {
-        const fullname = e.target.value;
-        setFullname(fullname);
-      };
+  const [message, setMessage] = useState("");
 
-    const onChangeEmail = (e) => {
-        const email = e.target.value;
-        setEmail(email);
-    };
-  
-    const onChangePassword = (e) => {
-      const password = e.target.value;
-      setPassword(password);
-    };
-    const onChangePassword2 = (e) => {
-        const password2 = e.target.value;
-        setPassword2(password2);
-      };
-  
-    // auth
-    const history = useHistory();
-    const signup = (e) => {
-      e.preventDefault();
-      setMessage("");
-  
-      const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+  const onChangeUsername = (e) => {
+    const username = e.target.value;
+    setUsername(username);
+  };
 
-      
-      if (username === "" || password === "" || email === "" || fullname === "" || password2 === "") {
-        setMessage("All fields must not be empty");
-      }
-      else if (username.length > 50 || password.length > 50 || email.length > 50 || fullname.length > 50 || password2.length > 50) {
-        setMessage("All fields must not exceed 50 character");
-      }
-      else if (!regex.test(email)) {
-        setMessage("Email is invalid");
-      }
-      else if (password !== password2) {
-        setMessage("Passwords don't match");
-      }
-      else {
-        AuthService.register(username, fullname, email, password).then(
-          () => {
-            props.updateUserStatus();
-            history.push("/");
-          },
-          (error) => {
-            const resMessage =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString();
-    
-            setMessage(resMessage);
-          }
-        );
-      }
-    };
-  
-    // auto go to home when logged in
-    if (AuthService.getCurrentUser()) {
-      history.replace('/');
+  const onChangeFullname = (e) => {
+    const fullname = e.target.value;
+    setFullname(fullname);
+  };
+
+  const onChangeEmail = (e) => {
+    const email = e.target.value;
+    setEmail(email);
+  };
+
+  const onChangePassword = (e) => {
+    const password = e.target.value;
+    setPassword(password);
+  };
+  const onChangePassword2 = (e) => {
+    const password2 = e.target.value;
+    setPassword2(password2);
+  };
+
+  // auth
+  const history = useHistory();
+  const signup = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+
+
+    if (username === "" || password === "" || email === "" || fullname === "" || password2 === "") {
+      setMessage("All fields must not be empty");
     }
+    else if (username.length > 50 || password.length > 50 || email.length > 50 || fullname.length > 50 || password2.length > 50) {
+      setMessage("All fields must not exceed 50 character");
+    }
+    else if (!regex.test(email)) {
+      setMessage("Email is invalid");
+    }
+    else if (password !== password2) {
+      setMessage("Passwords don't match");
+    }
+    else {
+      try {
+        await AuthService.register(username, fullname, email, password)
+        props.updateUserStatus();
+        history.push("/");
+      }
+      catch (error) {
+        const resMessage =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
+
+        setMessage(resMessage);
+
+      }
+    }
+  };
+
+  // auto go to home when logged in
+  if (AuthService.getCurrentUser()) {
+    history.replace('/');
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -125,16 +125,16 @@ export default function SignUp(props) {
           Sign up
         </Typography>
         <form className={classes.form}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-          {message && (
-              <div className="form-group">
-                <Alert severity="error">
-                  {message}
-                </Alert>
-              </div>
-          )}
-          <TextField
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              {message && (
+                <div className="form-group">
+                  <Alert severity="error">
+                    {message}
+                  </Alert>
+                </div>
+              )}
+              <TextField
                 autoComplete="username"
                 variant="outlined"
                 required
@@ -144,7 +144,7 @@ export default function SignUp(props) {
                 name="username"
                 autoFocus
                 onChange={(value) => onChangeUsername(value)}
-            />    
+              />
             </Grid>
             <Grid item xs={12}>
               <TextField

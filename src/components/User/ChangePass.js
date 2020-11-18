@@ -9,7 +9,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import DataService from "../utils/data.service";
+import DataService from "../../utils/data.service";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -52,11 +52,11 @@ export default function ChangePass() {
     };
 
     // auth
-    const changePass = (e) => {
+    const changePass = async (e) => {
         e.preventDefault();
         setMessage("");
 
-        
+
 
         if (oldPass === "" || newPass === "" || newPass2 === "") {
             setMessage("All fields must not be empty");
@@ -71,23 +71,22 @@ export default function ChangePass() {
             setStatus("error");
         }
         else {
-            DataService.changePassword(oldPass, newPass).then(
-                () => {
-                    setMessage("Thanh đổi thành công");
-                    setStatus("success");
-                },
-                (error) => {
-                    const resMessage =
-                        (error.response &&
-                            error.response.data &&
-                            error.response.data.message) ||
-                        error.message ||
-                        error.toString();
+            try {
+                await DataService.changePassword(oldPass, newPass)
+                setMessage("Thanh đổi thành công");
+                setStatus("success");
+            }
+            catch (error) {
+                const resMessage =
+                    (error.response &&
+                        error.response.data &&
+                        error.response.data.message) ||
+                    error.message ||
+                    error.toString();
 
-                    setMessage(resMessage);
-                    setStatus("error");
-                }
-            );
+                setMessage(resMessage);
+                setStatus("error");
+            }
         }
     };
 

@@ -9,15 +9,17 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import Menu from "./components/Menu/Menu";
 import Home from "./components/Home";
-import Account from "./components/Account";
-import Dashboard from "./components/Dashboard";
-import Board from "./components/Board";
-import Login from "./components/Login";
-import SignUp from "./components/SignUp";
+import Account from "./components//User/Account";
+import Dashboard from "./components/Dashboard/Dashboard";
+import Board from "./components/Board/Board";
+import Login from "./components/Authenticate/Login";
+import SignUp from "./components/Authenticate/SignUp";
 import NotFound from "./components/NotFound";
 import PrivateRoute from "./PrivateRoute";
 import AuthService from "./utils/auth.service";
-import ChangePass from "./components/ChangePass";
+import ChangePass from "./components/User/ChangePass";
+
+
 const routes = [
   {
     path: "/",
@@ -65,6 +67,7 @@ export default function App() {
 
   const [currentUser, setCurrentUser] = useState();
 
+  // update current user in local
   const updateUserStatus = () => {
     const user = AuthService.getCurrentUser();
     if (user) {

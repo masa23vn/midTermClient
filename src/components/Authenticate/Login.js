@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   useHistory,
   useLocation
@@ -12,7 +12,7 @@ import Typography from '@material-ui/core/Typography';
 import Alert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import AuthService from "../utils/auth.service";
+import AuthService from "../../utils/auth.service";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -54,7 +54,7 @@ export default function Login(props) {
   const history = useHistory();
   const location = useLocation();
   const { from } = location.state || { from: { pathname: "/" } };
-  const login = (e) => {
+  const login = async (e) => {
     e.preventDefault();
     setMessage("");
 
@@ -62,22 +62,22 @@ export default function Login(props) {
       setMessage("Username or password must not be empty");
     }
     else {
-      AuthService.login(username, password).then(
-        () => {
-          props.updateUserStatus();
-          history.replace(from);
-        },
-        (error) => {
-          const resMessage =
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString();
+      try {
+        await AuthService.login(username, password)
+        props.updateUserStatus();
+        history.replace(from);
+      }
+      catch (error) {
+        const resMessage =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
 
-          setMessage(resMessage);
-        }
-      );
+        setMessage(resMessage);
+
+      }
     }
   };
 
@@ -98,11 +98,11 @@ export default function Login(props) {
         </Typography>
         <form className={classes.form}>
           {message && (
-              <div className="form-group">
-                <Alert severity="error">
-                  {message}
-                </Alert>
-              </div>
+            <div className="form-group">
+              <Alert severity="error">
+                {message}
+              </Alert>
+            </div>
           )}
 
           <TextField
@@ -139,7 +139,6 @@ export default function Login(props) {
           >
             Sign In
           </Button>
-
         </form>
       </div>
     </Container>

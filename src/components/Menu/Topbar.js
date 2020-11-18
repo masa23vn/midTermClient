@@ -11,7 +11,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import {
   NavLink,
 } from "react-router-dom";
-import useTitle from "../../utils/useTitle";
+import useTitle from "../../utils/title.service";
 import AuthService from "../../utils/auth.service";
 
 const drawerWidth = 240;

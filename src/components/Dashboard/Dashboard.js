@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Link,
-} from "react-router-dom";
 import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -17,18 +11,14 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import DataService from "../utils/data.service";
-
+import DataService from "../../utils/data.service";
+import BoardCard from "./BoardCard";
 
 const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
-    height: '100vh',
     overflow: 'auto',
     marginTop: '20px',
-  },
-  icon: {
-    marginRight: theme.spacing(2),
   },
   heroContent: {
     backgroundColor: theme.palette.background.paper,
@@ -41,50 +31,32 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(8),
     paddingBottom: theme.spacing(8),
   },
-  card: {
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  cardMedia: {
-    paddingTop: '56.25%', // 16:9
-  },
-  cardContent: {
-    flexGrow: 1,
-  },
-  footer: {
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(6),
-  },
-  popover: {
-    pointerEvents: 'none',
-  },
-  paper: {
-    padding: theme.spacing(1),
-  },
 }));
 
 export default function Dashboard() {
   const classes = useStyles();
   const [data, setData] = useState();       // list of board
 
-  const [open, setOpen] = useState(false);    // open/close create dialog
+  const [open, setOpen] = useState(false);    // open/close create new board dialog
   const [name, setName] = useState("");                   // name of new board
   const [message, setMessage] = useState("");             // error mess when create
   const [status, setStatus] = useState("error");          // check if create is success
 
   // get all boards of user from database
-  const getBoard = () => {
-    DataService.getUserBoard()
-      .then(res => setData(res.data))
-      .catch(err => err);
-  }
-
   useEffect(() => {
-    getBoard();
+    async function fetchData() {
+      try {
+        const res = await DataService.getUserBoard()
+        setData(res.data)
+      }
+      catch (error) {
+      }
+    }
+    fetchData();
   }, [])
 
-  // manage dialog
+
+  // manage create new board dialog
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -97,7 +69,7 @@ export default function Dashboard() {
   const onChangeName = (e) => {
     setName(e.target.value);
   };
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (name === "") {
       setMessage("Name fields must not be empty");
       setStatus("error");
@@ -107,27 +79,35 @@ export default function Dashboard() {
       setStatus("error");
     }
     else {
-      DataService.createBoard(name).then(
-        () => {
-          setMessage("Tạo thành công");
-          setStatus("success");
-          setName("");
-          getBoard();
-        },
-        (error) => {
-          const resMessage =
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString();
+      try {
+        const res = await DataService.createBoard(name);
+        setMessage("Tạo thành công");
+        setStatus("success");
+        setName("");
+        // add new board to front end data
+        const newData = data.slice();
+        newData.push({ ID: res.data.ID, name: name });
+        setData(newData);
+      }
+      catch (error) {
+        const resMessage =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
 
-          setMessage(resMessage);
-          setStatus("error");
-        });
+        setMessage(resMessage);
+        setStatus("error");
+      }
     }
   };
 
+  // delete board
+  const deleteBoard = (i) => {
+    const newData = data.filter((e) => { return e.ID !== i })
+    setData(newData);
+  }
 
   return (
     <React.Fragment>
@@ -190,7 +170,7 @@ export default function Dashboard() {
               {data ?
                 data.map((board) => (
                   <Grid item key={board.ID} xs={12} sm={6} md={4}>
-                    <CustomCard board={board} getBoard={() => getBoard()}></CustomCard>
+                    <BoardCard board={board} deleteBoard={(i) => deleteBoard(i)}></BoardCard>
                   </Grid>
                 )) : ""
               }
@@ -201,62 +181,3 @@ export default function Dashboard() {
     </React.Fragment>
   );
 }
-
-function CustomCard(props) {
-  const [openDelete, setOpenDelete] = useState(false);    // open/close delete dialog
-
-  const classes = useStyles();
-  const board = props.board;
-  const urlView = "/Board/" + board.ID;
-
-  // delete board
-  const handleClickOpenDelete = () => {
-    setOpenDelete(true);
-  };
-  const handleCloseDelete = () => {
-    setOpenDelete(false);
-  };
-
-  const handleDelete = () => {
-    DataService.deleteBoard(board.ID)
-      .then(res => {
-        setOpenDelete(false);
-        props.getBoard();
-      })
-      .catch(err => err);;
-  };
-
-  return (
-    <Card className={classes.card}>
-      <CardContent className={classes.cardContent}>
-        <Typography gutterBottom variant="h5" component="h2">
-          {board.name}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Button size="small" color="primary" component={Link} to={urlView}>
-          View
-                    </Button>
-        <Button size="small" color="primary" onClick={handleClickOpenDelete}>
-          Delete
-                    </Button>
-        <Dialog open={openDelete} maxWidth="xs" fullWidth={true} onClose={handleCloseDelete} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Are you sure ?</DialogTitle>
-          <DialogContent>
-            <Typography >Do you want to delete this board - {board.name}</Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDelete} color="primary">
-              Cancel
-                      </Button>
-            <Button onClick={handleDelete} color="primary">
-              Delete
-                      </Button>
-          </DialogActions>
-        </Dialog>
-
-      </CardActions>
-    </Card>
-  );
-
-} 

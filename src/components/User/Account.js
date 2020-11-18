@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -9,7 +9,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import DataService from "../utils/data.service";
+import DataService from "../../utils/data.service";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -32,80 +32,81 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Account() {
-    const classes = useStyles();
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
-    const [fullname, setFullname] = useState("");
-    const [message, setMessage] = useState("");
-    const [status, setStatus] = useState("error");
+  const classes = useStyles();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [fullname, setFullname] = useState("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState("error");
 
-    useEffect(()=>{
-      DataService.getUserInfo()
-      .then(res => res.data)
-      .then(res => {
-        setUsername(res[0].username);
-        setEmail(res[0].email);
-        setFullname(res[0].fullname);
-      })
-        .catch(err => err);
-    },[])
-  
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await DataService.getUserInfo()
+        setUsername(res.data[0].username);
+        setEmail(res.data[0].email);
+        setFullname(res.data[0].fullname);
+      }
+      catch (error) {
+      }
+    }
+    fetchData();
+  }, [])
 
-    const onChangeUsername = (e) => {
-      const username = e.target.value;
-      setUsername(username);
-    };
-  
-    const onChangeFullname = (e) => {
-        const fullname = e.target.value;
-        setFullname(fullname);
-      };
+  const onChangeUsername = (e) => {
+    const username = e.target.value;
+    setUsername(username);
+  };
 
-    const onChangeEmail = (e) => {
-        const email = e.target.value;
-        setEmail(email);
-    };
-    
-    // auth
-    const signup = (e) => {
-      e.preventDefault();
-      setMessage("");
-  
-      const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+  const onChangeFullname = (e) => {
+    const fullname = e.target.value;
+    setFullname(fullname);
+  };
 
-      
-      if (username === "" || email === "" || fullname === "") {
-        setMessage("All fields must not be empty");
+  const onChangeEmail = (e) => {
+    const email = e.target.value;
+    setEmail(email);
+  };
+
+  // auth
+  const signup = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+
+
+    if (username === "" || email === "" || fullname === "") {
+      setMessage("All fields must not be empty");
+      setStatus("error");
+    }
+    else if (username.length > 50 || email.length > 50 || fullname.length > 50) {
+      setMessage("All fields must not exceed 50 character");
+      setStatus("error");
+    }
+    else if (!regex.test(email)) {
+      setMessage("Email is invalid");
+      setStatus("error");
+    }
+    else {
+      try {
+        await DataService.changeUserInfo(username, fullname, email)
+        setMessage("Thanh đổi thành công");
+        setStatus("success");
+      }
+      catch (error) {
+        const resMessage =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
+
+        setMessage(resMessage);
         setStatus("error");
       }
-      else if (username.length > 50 || email.length > 50 || fullname.length > 50) {
-        setMessage("All fields must not exceed 50 character");
-        setStatus("error");
-      }
-      else if (!regex.test(email)) {
-        setMessage("Email is invalid");
-        setStatus("error");
-      }
-      else {
-        DataService.changeUserInfo(username, fullname, email).then(
-          () => {
-            setMessage("Thanh đổi thành công");
-            setStatus("success");
-            },
-          (error) => {
-            const resMessage =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString();
-    
-            setMessage(resMessage);
-            setStatus("error");
-          }
-        );
-      }
-    };
+    }
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -118,16 +119,16 @@ export default function Account() {
           Account's info
         </Typography>
         <form className={classes.form} noValidate>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-          {message && (
-              <div className="form-group">
-                <Alert severity={status}>
-                  {message}
-                </Alert>
-              </div>
-          )}
-          <TextField
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              {message && (
+                <div className="form-group">
+                  <Alert severity={status}>
+                    {message}
+                  </Alert>
+                </div>
+              )}
+              <TextField
                 autoComplete="username"
                 variant="outlined"
                 required
@@ -138,7 +139,7 @@ export default function Account() {
                 name="username"
                 autoFocus
                 onChange={(value) => onChangeUsername(value)}
-            />    
+              />
             </Grid>
             <Grid item xs={12}>
               <TextField
